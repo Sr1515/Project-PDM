@@ -80,48 +80,44 @@ function MapCliente() {
         const fetchData = async () => {
             await Promise.all([getUserLocation(), fetchClientes()]);
             setLoading(false);
+
         };
 
         fetchData();
     }, [tokenState]);
-
-
-    if (loading) {
-        return (
-            <Config>
-                <Container>
-                    <Title>Encontre seus clientes</Title>
-                    <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
-                        <ActivityIndicator size="large" color="#fff" />
-                        <Text style={{ color: "white" }}>Carregando...</Text>
-                    </View>
-                </Container>
-                <FooterMenu />
-            </Config>
-        );
-    }
 
     return (
         <Config>
             <Container>
                 <Title>Encontre seus clientes</Title>
 
-                {userLocation ? (
+                {loading ? (
+                    <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+                        <ActivityIndicator size="large" color="#fff" />
+                        <Text style={{ color: "white" }}>Carregando...</Text>
+                    </View>
+                ) : userLocation ? (
                     <StyledMapView region={userLocation}>
                         {clientes.length > 0 ? (
-                            clientes.map((client) => (
-                                <Marker
-                                    key={client._id}
-                                    coordinate={{
-                                        latitude: client.address.coordinates[0],
-                                        longitude: client.address.coordinates[1],
-                                    }}
-                                    title={client.name}
-                                    description={`ID: ${client._id}`}
-                                />
-                            ))
+                            clientes.map((client) => {
+                                const [latitude, longitude] = client.address.coordinates;
+                                if (latitude && longitude) {
+                                    return (
+                                        <Marker
+                                            key={client._id}
+                                            coordinate={{
+                                                latitude,
+                                                longitude,
+                                            }}
+                                            title={client.name}
+                                            description={`ID: ${client._id}`}
+                                        />
+                                    );
+                                }
+                                return null;
+                            })
                         ) : (
-                            <Text>Nenhum cliente encontrado</Text>
+                            <Text style={{ color: "white" }}>Nenhum cliente encontrado</Text>
                         )}
                     </StyledMapView>
                 ) : (
@@ -135,7 +131,9 @@ function MapCliente() {
                 />
 
             </Container>
+
             <FooterMenu />
+
         </Config>
     );
 }

@@ -1,0 +1,10 @@
+services:
+  api:
+    build: .
+    container_name: api
+    ports:
+      - "3000:3000"
+    environment:
+      - SECRET=moacirehfoda
+      - PORT=3000
+      - CONNECTION_URL=
